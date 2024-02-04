@@ -1,13 +1,15 @@
 import React from 'react'
-import Header from './components/Header'
+import Navbar from '../common/Navbar'
+import Main from './components/Main'
+
 
 function MainPage() {
   return (
     <>
-    <Header/>
-    <main>
-    
-    </main>
+      <div className="lg:px-[117px]">
+        <Navbar />
+        <Main/>
+      </div>
     </>
   )
 }
