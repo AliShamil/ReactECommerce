@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import LetterIcon from "../../assets/Letter.svg";
 import LockIcon from "../../assets/Lock.svg";
 import UserIcon from "../../assets/User.svg";
@@ -46,7 +47,7 @@ function RegisterForm() {
             </form>
             <div className="text-teal-800 mt-3">
                 <span>Do you have account? </span>
-                <a className="underline">Log in</a>
+                <Link  to="/login" className="underline">Log In</Link>
             </div>
         </div>
     )
