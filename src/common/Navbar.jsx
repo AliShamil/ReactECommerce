@@ -39,8 +39,9 @@ function Navbar() {
             </select>
           </li>
           <li>
-            <button onClick={() => navigate("/cart")} className="p-6 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">
+            <button onClick={() => navigate("/cart")} className="relative p-6 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">
               <img src={CartIcon} className="w-[20px] h-[20px]" alt="cart_icon" />
+              <span className="absolute rounded-full bg-black top-[-5px] right-[10px]  py-[0.5px] px-[8px] text-white">5</span>
             </button>
           </li>
         </ul>
@@ -57,21 +58,19 @@ function Navbar() {
               ☰
             </button>
           </div>
-          <button>
+          <button onClick={() => navigate("/mainpage")}>
             <img src={Logo} className="mt-[24px] mb-[15px]" alt="my_logo" />
           </button>
         </div>
         <div className={`${openNav ? "" : "hidden"}`}>
           <ul className="flex flex-col items-center mb-[25px] gap-8">
-            <li className="flex px-5  flex-col text-center w-full">
-              <button className="py-3 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">WOMEN</button>
-            </li>
-            <li className="flex px-5 flex-col text-center w-full">
-              <button className="py-3 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">MEN</button>
-            </li>
-            <li className="flex px-5 flex-col text-center w-full">
-              <button className="py-3 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">KIDS</button>
-            </li>
+          {categories.map((c) =>
+          (<li className="flex px-5  flex-col text-center w-full">
+            <button onClick={() => {
+              setCurrentCategory(c)
+              filterProducts(c)
+            }} className="py-3 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">{c}</button>
+          </li>))}
           </ul>
           <ul className="flex items-center justify-center gap-16">
             <li className="flex">
@@ -85,8 +84,9 @@ function Navbar() {
               </select>
             </li>
             <li>
-              <button className="py-3 px-6 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">
+              <button onClick={() => navigate("/cart")} className="py-3 relative px-6 border-b-2 border-transparent hover:text-green-400 hover:border-green-400">
                 <img src={CartIcon} className="w-[20px] h-[20px]" alt="cart_icon" />
+                <span className="absolute rounded-full bg-black top-[-10px] right-[10px]  py-[1px] px-[8px] text-white">5</span>
               </button>
             </li>
           </ul>
