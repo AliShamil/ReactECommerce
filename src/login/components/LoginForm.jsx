@@ -1,8 +1,52 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LetterIcon from "../../assets/Letter.svg";
 import LockIcon from "../../assets/Lock.svg";
+import { useState, useContext } from "react";
+import { useCookieContext } from "../../context/CookieContext";
 
 function LoginForm() {
+    const { setCookie, cookies } = useCookieContext()
+    const [formData, setFormData] = useState({});
+    const navigate = useNavigate()
+
+
+    const signIn = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/auth/login", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers:
+                {
+                    "Content-type": "application/json"
+                }
+            })
+
+            if (response.ok) {
+                const data = await response.json();
+                const token = data.user.token;
+                setCookie('accessToken', token, { path: '/' });
+                console.log(data);
+                navigate("/mainpage")
+            }
+            else {
+                console.log(response.status)
+                console.log(response.json())
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevForm) => ({
+            ...prevForm,
+            [name]: value,
+        }));
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        signIn();
+    }
     return (
         <div className="w-screen h-screen flex flex-col justify-center items-center">
             <h2 className="text-3xl font-bold">Hello Again!</h2>
@@ -15,7 +59,8 @@ function LoginForm() {
                         alt="letterIcon"
                     />
 
-                    <input className="px-3 py-3 mx-1 h-full w-full outline-none" placeholder='Email Address' type="email" />
+                    <input className="px-3 py-3 mx-1 h-full w-full outline-none" placeholder='Email Address' type="email"
+                        name="email" onChange={(e) => handleChange(e)} />
                 </div>
                 <div className='flex items-center my-2 rounded-[30px] w-full sm:max-w-[400px] border border-zinc-100 h-fit px-3'>
                     <img
@@ -23,10 +68,11 @@ function LoginForm() {
                         src={LockIcon}
                         alt="letterIcon"
                     />
-                    <input className=" px-3 py-3 mx-1 h-full w-full outline-none" placeholder='Password' type="password" />
+                    <input className=" px-3 py-3 mx-1 h-full w-full outline-none" placeholder='Password' type="password"
+                        name="password" onChange={(e) => handleChange(e)} />
                 </div>
                 <div className="w-full flex col-span-2 justify-center">
-                    <button className="bg-green-400 w-full sm:max-w-[400px]  mt-4 text-white py-2 " type="submit">Login</button>
+                    <button onClick={(e) => handleSubmit(e)} className="bg-green-400 w-full sm:max-w-[400px]  mt-4 text-white py-2 " type="submit">Login</button>
                 </div>
             </form>
             <div className="text-teal-800 mt-3">
