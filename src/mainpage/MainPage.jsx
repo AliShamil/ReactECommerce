@@ -1,22 +1,22 @@
 import React from 'react'
 import Navbar from '../common/Navbar'
-import Main from './components/Main'
 import Context from '../context/GlobalContext'
 import { useCookieContext } from '../context/CookieContext'
 import ProductCard from './components/ProductCard'
 import { useEffect ,useContext} from 'react'
 function MainPage() {
   const { cookies } = useCookieContext();
-  const { currentCategory, filteredProducts, filterProducts, getProducts, products } = useContext(Context)
+  const { currentCategory, filteredProducts, filterProducts, getProducts, getOrders,products} = useContext(Context)
 
-  useEffect(() => {
-      getProducts();
-  }, [])
-
+useEffect(() => {
+    getProducts(),
+    getOrders()
+}, [])
   return (
       <>
           <div className="md:px-20 lg:px-28">
               <Navbar />
+              
               <div className="px-6 ">
                   <div>
                       <h1 className="text-4xl lg:text-5xl font-light py-14 px-5">

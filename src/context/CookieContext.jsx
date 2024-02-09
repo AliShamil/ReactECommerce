@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext} from 'react';
 import { useCookies } from 'react-cookie';
 
 const CookieContext = createContext();

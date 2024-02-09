@@ -1,11 +1,12 @@
-import ProductInfo from './components/ProductInfo'
 import Navbar from '../common/Navbar'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useContext } from 'react'
 import { useParams } from 'react-router-dom'
+import Context from '../context/GlobalContext'
 function Product() {
     const { id } = useParams();
     const [product, setProduct] = useState({});
     const [activeIMG, setActiveIMG] = useState('');
+    const { addProductToOrder,currency } = useContext(Context)
 
     const getProductById = async () => {
         const response = await fetch(`http://localhost:5000/api/products/${id}`);
@@ -24,21 +25,32 @@ function Product() {
     useEffect(() => {
         getProductById()
     }, [])
+
     return (
         <div className="lg:px-[117px]">
             <Navbar />
             <div className="flex flex-col justify-start gap-14 lg:flex-row mt-[80px] ">
-                <div className="flex lg:flex-col mx-14 lg:mx-0 order-2 lg:order-1 gap-[30px]">
-                    {product.gallery && product.gallery.map((src) =>
-                    (<div onClick={() => setActiveIMG(src)} className="border border-transparent hover:border-zinc-300 hover:shadow-xl hover:shadow-slate-600 w-[90px] h-[90px]">
-                        <img
-                            className="object-cover w-full h-full"
-                            src={src}
-                            alt="hehe"
-                        />
-                    </div>))}
+            <div className="flex lg:flex-col mx-14 lg:mx-0 order-2 lg:order-1 gap-[30px]">
+                    {product.gallery &&
+                        product.gallery.map((src) => (
+                            <div
+                                key={src}
+                                onClick={() => setActiveIMG(src)}
+                                className={`border ${
+                                    activeIMG === src
+                                        ? ' border-2 border-green-400 shadow-xl shadow-slate-600'
+                                        : 'border-transparent'
+                                } hover:border-zinc-300 hover:shadow-xl hover:shadow-slate-600 w-[90px] h-[90px]`}
+                            >
+                                <img
+                                    className="object-cover w-full h-full"
+                                    src={src}
+                                    alt="hehe"
+                                />
+                            </div>
+                        ))}
                 </div>
-                <div className="flex justify-start px-4 order-1 lg:order-2 w-full max-w-[800px] h-[600px]">
+                <div className="flex justify-start px-4 order-1 lg:order-2 w-full max-w-[800px] h-64 sm:h-[600px]">
                     <img
                         className="object-fill lg:object-cover w-full h-full"
                         src={activeIMG}
@@ -67,11 +79,13 @@ function Product() {
                     <div className="mt-10">
                         <p className="text-[18px] font-bold">PRICE:</p>
                         <p className="text-[18px] font-bold mt-3">
-                            <span>$</span>{product.price}
+                            <span>{currency}</span>{currency==="$"?Number(product.price).toFixed(2):(product.price * 1.7).toFixed(2)}
                         </p>
                     </div>
                     <div className="mt-10">
-                        <button className="bg-[#5ECE7B] text-white w-full max-w-[300px] py-4 font-medium">
+                        <button onClick={() => {
+                            addProductToOrder(product);
+                        }} className="bg-[#5ECE7B] text-white w-full max-w-[300px] py-4 font-medium">
                             ADD TO CART
                         </button>
                     </div>

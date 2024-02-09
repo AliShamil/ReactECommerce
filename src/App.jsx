@@ -5,26 +5,33 @@ import Login from "./login/Login";
 import MainPage from "./mainpage/MainPage";
 import Product from "./product/Product";
 import Register from "./register/Register";
-import { CookieProvider } from "./context/CookieContext";
 import Context from "./context/GlobalContext";
 import { useContext } from "react";
+import { useCookieContext } from "./context/CookieContext";
 function App() {
-  const { cookies } = useContext(Context)
+  const { cookies } = useCookieContext()
+  const { isTokenExpired } = useContext(Context)
+  const isAuthenticated = cookies.accessToken && !isTokenExpired(cookies.accessToken) ? true : false;
   return (
     <>
-      <CookieProvider>
         <Routes>
-          <Route path="/" element={<Navigate to="/mainpage" replace />}></Route>
-
-          <Route path="/mainpage" element={<MainPage />} />
-          <Route path="/login" element={<Login />} />
-
+          <Route path="/" element={<Navigate to="/login" replace />}></Route>
           <Route path="/register" element={<Register />} />
-          <Route path="/product/:id" element={<Product />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path='*' element={<NotFound />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/mainpage"
+            element={isAuthenticated ? <MainPage /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/product/:id"
+            element={isAuthenticated ? <Product /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/cart"
+            element={isAuthenticated ? <Cart /> : <Navigate to="/login" replace />}
+          />
+          <Route path="*" element={<NotFound/>}></Route>
         </Routes>
-      </CookieProvider>
     </>
   )
 }

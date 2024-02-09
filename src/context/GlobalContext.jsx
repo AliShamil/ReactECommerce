@@ -1,40 +1,52 @@
-import { createContext, useState ,useEffect} from "react";
+import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useCookieContext } from "./CookieContext";
 const Context = createContext();
 export default Context;
 
 export const GlobalContext = ({ children }) => {
- 
+    const { cookies } = useCookieContext();
     const [categories, setCategories] = useState([])
     const [currentCategory, setCurrentCategory] = useState("All")
+    const [currency, setCurrency] = useState(() => {
+        return localStorage.getItem("currency") || "$";
+    });
     const [products, setProducts] = useState([])
     const [filteredProducts, setFilteredProducts] = useState([])
+    const [orders, setOrders] = useState([])
     const navigate = useNavigate();
-
+    const totalQuantity = orders.reduce((total, order) => total + order.quantity, 0);
     async function getProducts() {
-        const response = await fetch("http://localhost:5000/api/products");
-        if (response.ok) {
-            const data = await response.json()
-            setProducts(data.product)
-        }
-        else {
-            console.log(response.status)
-            console.log(response.json())
+        try {
+            const response = await fetch("http://localhost:5000/api/products");
+            if (response.ok) {
+                const data = await response.json()
+                setProducts(data.product)
+            }
+            else {
+                console.log(response.status)
+                console.log(response.json())
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
     async function getCategories() {
-        const response = await fetch("http://localhost:5000/api/products");
-        if (response.ok) {
-            const data = await response.json()
-            const { product } = data;
-            const cat = Array.from(new Set(product.map(p => p.category)));
-            setCategories(["All", ...cat])
-        }
-        else {
-            console.log(response.status)
-            console.log(response.json())
+        try {
+            const response = await fetch("http://localhost:5000/api/products");
+            if (response.ok) {
+                const data = await response.json()
+                const { product } = data;
+                const cat = Array.from(new Set(product.map(p => p.category)));
+                setCategories(["All", ...cat])
+            }
+            else {
+                console.log(response.status)
+                console.log(response.json())
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -48,9 +60,61 @@ export const GlobalContext = ({ children }) => {
         }
     }
 
-    useEffect(()=>{
-        getProducts()
-    },[])
+    function addProductToOrder(p) {
+        const productExists = orders.find(product => product.id === p.id);
+
+        if (!productExists) {
+            const productWithQuantity = { ...p, quantity: 1 };
+            setOrders(prev => [...prev, productWithQuantity]);
+        } else {
+            setOrders(prev =>
+                prev.map(product =>
+                    product.id === p.id ? { ...product, quantity: product.quantity + 1 } : product
+                )
+            );
+        }
+    }
+
+    async function getOrders() {
+        try {
+            const response = await fetch("http://localhost:5000/api/orders", {
+                headers:
+                {
+                    "Content-type": "application/json",
+                    "Authorization": `Bearer ${cookies.accessToken}`
+                }
+            })
+            if (response.ok) {
+                const data = await response.json();
+                setOrders(data.orderItems);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const isTokenExpired = (token) => {
+        if (!token) {
+            return true;
+        }
+
+        const [, payloadBase64] = token.split('.');
+
+        const payload = JSON.parse(atob(payloadBase64));
+
+        const expirationTime = payload.exp;
+
+        const currentTime = Math.floor(Date.now() / 1000);
+        return expirationTime < currentTime;
+    };
+
+    useEffect(() => {
+        localStorage.setItem("currency", currency);
+    }, [currency]);
+
+    useEffect(() => {
+        getOrders()
+    }, [])
 
     const contextData = {
         getCategories: getCategories,
@@ -61,7 +125,15 @@ export const GlobalContext = ({ children }) => {
         filterProducts: filterProducts,
         filteredProducts: filteredProducts,
         products: products,
-        getProducts: getProducts
+        getProducts: getProducts,
+        orders: orders,
+        setOrders: setOrders,
+        getOrders: getOrders,
+        isTokenExpired: isTokenExpired,
+        addProductToOrder: addProductToOrder,
+        currency: currency,
+        setCurrency: setCurrency,
+        totalQuantity:totalQuantity
     }
 
     return (

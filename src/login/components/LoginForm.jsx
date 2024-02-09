@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import LetterIcon from "../../assets/Letter.svg";
 import LockIcon from "../../assets/Lock.svg";
-import { useState, useContext } from "react";
+import { useState} from "react";
 import { useCookieContext } from "../../context/CookieContext";
 
 function LoginForm() {
-    const { setCookie, cookies } = useCookieContext()
+    const { setCookie} = useCookieContext()
     const [formData, setFormData] = useState({});
     const navigate = useNavigate()
 
