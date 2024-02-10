@@ -11,11 +11,8 @@ function RegisterForm() {
     const [formData, setFormData] = useState({});
     const navigate = useNavigate();
     const { setOrders } = useContext(Context);
-    const {
-        register,
-        handleSubmit,
-        formState: { errors }
-    } = useForm();
+    const {register,handleSubmit,formState: { errors }} = useForm();
+    
     const onSubmit = (data) => {
         signUp();
         console.log(data);

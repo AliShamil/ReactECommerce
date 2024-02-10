@@ -6,25 +6,24 @@ function Product() {
     const { id } = useParams();
     const [product, setProduct] = useState({});
     const [activeIMG, setActiveIMG] = useState('');
-    const { addProductToOrder,currency } = useContext(Context)
+    const { addProductToOrder,currency,getProductById } = useContext(Context)
 
-    const getProductById = async () => {
-        const response = await fetch(`http://localhost:5000/api/products/${id}`);
-        if (response.ok) {
-            const data = await response.json();
-            const { product } = data;
-            setProduct(product);
-            setActiveIMG(product.gallery.length ? product.gallery[0] : '')
-        }
-        else {
-            console.log(response.status)
-            console.log(response.json())
-        }
+    const configureProduct = async () => {
+        const p = await getProductById(id)
+        console.log(p)
+        setProduct(p);
+        console.log(product)
     }
 
     useEffect(() => {
-        getProductById()
+        configureProduct()
     }, [])
+
+    useEffect(() => {
+        if (product && product.gallery && product.gallery.length) {
+            setActiveIMG(product.gallery[0]);
+        }
+    }, [product]);
 
     return (
         <div className="lg:px-[117px]">
@@ -50,7 +49,7 @@ function Product() {
                             </div>
                         ))}
                 </div>
-                <div className="flex justify-start px-4 order-1 lg:order-2 w-full max-w-[800px] h-64 sm:h-[600px]">
+                <div className="flex justify-start px-4 order-1 lg:order-2 w-full max-w-[800px] h-full sm:h-[600px]">
                     <img
                         className="object-fill lg:object-cover w-full h-full"
                         src={activeIMG}

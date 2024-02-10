@@ -18,7 +18,6 @@ function Navbar() {
 
   const handleCurrencyChange = (event) => {
     setCurrency(event.target.value);
-    console.log(currency)
   };
 
   useEffect(() => {
